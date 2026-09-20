@@ -1,0 +1,37 @@
+name: Build JARVIS APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract JARVIS project
+        run: |
+          unzip -o JARVIS_GitHub_Build_Ready_New.zip
+          cd JARVIS_GitHub_Build_Ready
+          chmod +x gradlew 2>/dev/null || true
+
+      - name: Build APK
+        run: |
+          cd JARVIS_GitHub_Build_Ready
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: JARVIS-debug-apk
+          path: JARVIS_GitHub_Build_Ready/app/build/outputs/apk/debug/app-debug.apk
